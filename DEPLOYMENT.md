@@ -6,7 +6,7 @@
 |-----|----------|
 | Họ và tên | PHẠM THANH HƯNG |
 | Mã học viên | 01468 |
-| Repo | https://github.com/ThanhHungtaptanhhocpython/K4-Day12-01468-PHAMTHANHHUNG |
+| Repo | https://github.com/ThanhHungtaptanhhocpython/K4-Day12-2A202601468-PhamThanhHung |
 
 ## Service
 
