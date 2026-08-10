@@ -4,16 +4,16 @@
 
 | Mục | Nội dung |
 |-----|----------|
-| Họ và tên | AI Agent |
-| Mã học viên | K4-AI-01 |
-| Repo | local |
+| Họ và tên | PHẠM THANH HƯNG |
+| Mã học viên | 01468 |
+| Repo | https://github.com/ThanhHungtaptanhhocpython/K4-Day12-01468-PHAMTHANHHUNG |
 
 ## Service
 
 | Mục | Nội dung |
 |-----|----------|
-| Public URL | https://my-service.up.railway.app |
-| Platform | Railway |
+| Public URL | https://day12-chat-nnuj.onrender.com |
+| Platform | Render |
 | Ngày deploy | 2026-08-10 |
 
 ## Biến Môi Trường Đã Set Trên Cloud
@@ -32,13 +32,43 @@
 
 ```bash
 # 1. Liveness — mong đợi 200 {"status":"ok"}
-curl -i https://my-service.up.railway.app/healthz
+curl -i https://day12-chat-nnuj.onrender.com/healthz
+
+# 2. Readiness — mong đợi 200 {"status":"ready"} (đã nối được Redis)
+curl -i https://day12-chat-nnuj.onrender.com/readyz
+
+# 3. Không có token — mong đợi 401 kèm header WWW-Authenticate
+curl -i -X POST https://day12-chat-nnuj.onrender.com/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Hello"}'
+
+# 4. Có token — mong đợi 200 kèm câu trả lời
+curl -i -X POST https://day12-chat-nnuj.onrender.com/chat \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $API_TOKEN" \
+  -H "X-Client-Id: sv-test" \
+  -d '{"message":"Deploy là gì?"}'
+
+# 5. Rate limit — gọi 15 lần, những lần cuối phải trả 429
+for i in $(seq 1 15); do
+  curl -s -o /dev/null -w "%{http_code} " -X POST https://day12-chat-nnuj.onrender.com/chat \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $API_TOKEN" \
+    -H "X-Client-Id: sv-test" \
+    -d '{"message":"test"}'
+done; echo
 ```
 
 ## Kết Quả Chạy Thật
 
 ```
-Dùng phương án dự phòng
+{"status":"ok","service":"day12-chat-service","version":"1.0.0"}
+
+{"status":"ready","redis":true}
+
+{"detail":"invalid or missing bearer token"}
+
+{"reply":"Ngắn gọn: hello phụ thuộc vào ba yếu tố — cấu hình qua biến môi trường, health check để orchestrator biết trạng thái, và giới hạn tài nguyên.","client_id":"anonymous","turns_before":0,"usd_cost":2.115e-05,"usage":{"prompt":1,"completion":35}}
 ```
 
 ## Ảnh Chụp Màn Hình
@@ -46,9 +76,4 @@ Dùng phương án dự phòng
 Đặt ảnh trong thư mục `screenshots/`:
 - `screenshots/dashboard.png`
 - `screenshots/healthz.png`
-
----
-
-## Nếu Dùng Phương Án Dự Phòng
-
-Agent AI không có thẻ tín dụng để đăng ký cloud thật.
+- `screenshots/curl_test.png`
